@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街歩きスタンプラリー</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f0f0f0; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 400px; margin: 0 auto; }
+        .stamp { 
+            background: white; border: 3px dashed #ccc; border-radius: 15px; 
+            padding: 20px 10px; font-weight: bold; color: #ccc; transition: 0.3s;
+        }
+        /* スタンプが押された時の見た目 */
+        .stamp.active { 
+            border: 3px solid #ff6b6b; color: #ff6b6b; background: #fff5f5;
+            opacity: 1; transform: scale(1.05);
+        }
+        #message { margin-top: 20px; color: #d63031; font-weight: bold; min-height: 1.5em; }
+        .congrats { display: none; background: gold; padding: 10px; margin-top: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>街歩きスタンプラリー</h1>
+    <p>街に隠されたQRコードを探そう！</p>
+
+    <div class="grid">
+        <div id="s1" class="stamp">スポット1</div>
+        <div id="s2" class="stamp">スポット2</div>
+        <div id="s3" class="stamp">スポット3</div>
+        <div id="s4" class="stamp">スポット4</div>
+        <div id="s5" class="stamp">スポット5</div>
+        <div id="s6" class="stamp">スポット6</div>
+        <div id="s7" class="stamp">スポット7</div>
+        <div id="s8" class="stamp">スポット8</div>
+    </div>
+
+    <div id="message"></div>
+
+    <div id="congrats-msg" class="congrats">
+        🎉 全コンプリート！おめでとう！ 🎉<br>
+        この画面をスタッフに見せてね。
+    </div>
+
+    <script>
+        // --- 設定 ---
+        const totalSpots = 8; // 全部で何箇所か
+
+        // 1. URLの「?id=数字」を読み取る (Rの変数取得のようなイメージ)
+        const params = new URLSearchParams(window.location.search);
+        const getID = params.get('id');
+
+        // 2. ブラウザに保存されているスタンプ帳を読み出す
+        let myStamps = JSON.parse(localStorage.getItem('my_rally_data')) || [];
+
+        // 3. もし新しいIDを読み込んだら、リストに追加して保存
+        if (getID && !myStamps.includes(getID)) {
+            myStamps.push(getID);
+            localStorage.setItem('my_rally_data', JSON.stringify(myStamps));
+            document.getElementById('message').innerText = "新しいスタンプをゲット！";
+        } else if (getID) {
+            document.getElementById('message').innerText = "このスタンプは取得済みです";
+        }
+
+        // 4. 画面を更新（取得済みを赤くする）
+        myStamps.forEach(id => {
+            const target = document.getElementById('s' + id);
+            if (target) target.classList.add('active');
+        });
+
+        // 5. 全部揃ったかチェック
+        if (myStamps.length >= totalSpots) {
+            document.getElementById('congrats-msg').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
